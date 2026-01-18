@@ -11,8 +11,19 @@ import {
 } from "./components/ui/resizable"
 
 function App() {
+  // Calculate default width percentage to aim for ~440px width
+  // Available width = Window - LeftToolbar(52) - Divider(3) - Padding(8) ≈ Window - 63
+  const chromeWidth = 63;
+  const targetRightPx = 440;
+  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
+  const availableWidth = windowWidth - chromeWidth;
+  
+  // Calculate percentage, clamped reasonably to prevent layout breaking on extreme screen sizes
+  // clamping between 5% and 50%
+  const rightSize = Math.max(5, Math.min(50, (targetRightPx / availableWidth) * 100));
+  const chartSize = 100 - rightSize;
+
   return (
-   
     <div className="h-screen flex flex-col bg-[#0f0f1e] overflow-hidden">
       <Navbar />
       <div className="flex-1 min-h-0 p-1 flex flex-col">
@@ -23,11 +34,11 @@ function App() {
           <div className="w-[3px] bg-[#2a2e39] transition-colors duration-200"></div>
           <div className="flex-1 min-w-0 h-full">
             <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel defaultSize={78}>
+              <ResizablePanel defaultSize={chartSize}>
                  <ChartSection />
               </ResizablePanel>
               <ResizableHandle className="w-[3px] bg-[#2a2e39] transition-colors duration-200" />
-              <ResizablePanel defaultSize={22} minSize={10}>
+              <ResizablePanel defaultSize={rightSize} minSize={5}>
                  <RightSidebar />
               </ResizablePanel>
             </ResizablePanelGroup>
@@ -39,7 +50,6 @@ function App() {
         </div>
       </div>
     </div>
-    
   )
 }
 
